@@ -53,23 +53,23 @@ void merge ( StringArray * array, int left, int mid, int right ) {
     float ratioLeft = getDisorderRatio(leftStringArray);
     float ratioRight = getDisorderRatio(rightStringArray);
     if ( l1 <= 10 && ratioLeft < 0.1 ) {
-        printf("Switching to Insertion Sort for left SubArray with l1 = %d\n", l1);
+        printf("Switching to Insertion Sort for left SubArray with l1 = %dwith disorder ratio %f\n", l1, ratioLeft);
         insertionSort(leftStringArray);
     }
-    else if ( l1 < 50 && l1 >= 30 && ratioLeft <= 0.3 ) {
-        printf("Switching to Insertion Sort for left SubArray with l2 = %d\n", l1);
+    else if ( l1 < 50 && l1 > 10 && ratioLeft <= 0.3 ) {
+        printf("Switching to Shell Sort for left SubArray with l2 = %d with disorder ratio %f\n", l1, ratioLeft);
         shellSort(leftStringArray);
     }
     if ( l2 <= 10 && ratioRight < 0.1 ) {
-        printf("Switching to Insertion Sort for right SubArray with l1 = %d\n", l2);
+        printf("Switching to Insertion Sort for right SubArray with l1 = %d with disorder ratio %f\n", l2, ratioRight);
         insertionSort(rightStringArray);
     }
-    else if ( l2 < 50 && l2 >= 30 && ratioRight <= 0.3 ) {
-        printf("Switching to Insertion Sort for right SubArray with l1 = %d\n", l2);
+    else if ( l2 < 50 && l2 >= 10 && ratioRight <= 0.3 ) {
+        printf("Switching to Shell Sort for right SubArray with l1 = %d with disorder ratio %f\n", l2, ratioRight);
         shellSort(rightStringArray);
     }
     else {
-        printf("Proceeded by Merging\n");
+        printf("Proceeded by Merging with l1 =  %d and l2 = %d and disorder ratio = %f %f\n", l1,l2, ratioLeft, ratioRight);
         isMergeExecuted = 1;
         int i = 0, j = 0, k = left;
         while ( i < l1 && j < l2 ) {
@@ -92,77 +92,6 @@ void merge ( StringArray * array, int left, int mid, int right ) {
 
 }
 
-// void merge(StringArray *array, int left, int mid, int right) {
-//     int l1 = mid - left + 1;
-//     int l2 = right - mid;
-//     String *leftArray = (String *)malloc(sizeof(String) * l1);
-//     String *rightArray = (String *)malloc(sizeof(String) * l2);
-
-//     // Copy data into temporary arrays
-//     for (int i = 0; i < l1; i++) {
-//         leftArray[i] = array->strings[left + i];
-//     }
-//     for (int j = 0; j < l2; j++) {
-//         rightArray[j] = array->strings[mid + 1 + j];
-//     }
-
-//     // Create StringArrays for disorder ratio check
-//     StringArray *leftStringArray = buildStringArray(leftArray, l1);
-//     StringArray *rightStringArray = buildStringArray(rightArray, l2);
-//     float ratioLeft = getDisorderRatio(leftStringArray);
-//     float ratioRight = getDisorderRatio(rightStringArray);
-
-//     // Sort left part if needed
-//     if (l1 <= 10 && ratioLeft < 0.1) {
-//         printf("Switching to Insertion Sort for left array\n");
-//         insertionSort(leftStringArray);
-//     } 
-//     else if (l1 <= 50 && l1 > 10 && ratioLeft <= 0.3) {
-//         printf("Switching to Shell Sort for left array\n");
-//         shellSort(leftStringArray);
-//     }
-//     // Sort right part if needed
-//     if (l2 <= 10 && ratioRight < 0.1) {
-//         printf("Switching to Insertion Sort for right array\n");
-//         insertionSort(rightStringArray);
-//     } 
-//     else if (l2 <= 50 && l2 > 10 && ratioRight <= 0.3) {
-//         printf("Switching to Shell Sort for right array\n");
-//         shellSort(rightStringArray);
-//     }
-
-//     // If subarrays are large or disorder is high, use Merge Sort to merge
-//     if (l1 > 50 || l2 > 50 || ratioLeft > 0.3 || ratioRight > 0.3) {
-//         printf("Merging the left and right subarrays\n");
-//         int i = 0, j = 0, k = left;
-//         while (i < l1 && j < l2) {
-//             if (leftArray[i].l <= rightArray[j].l) {
-//                 array->strings[k++] = leftArray[i++];
-//             } else {
-//                 array->strings[k++] = rightArray[j++];
-//             }
-//         }
-//         while (i < l1) array->strings[k++] = leftArray[i++];
-//         while (j < l2) array->strings[k++] = rightArray[j++];
-//     } else {
-//         // If subarrays are small enough, simply copy them back
-//         printf("Subarrays small enough or ordered; copying back\n");
-//         int k = left;
-//         for (int i = 0; i < l1; i++) {
-//             array->strings[k++] = leftArray[i];
-//         }
-//         for (int j = 0; j < l2; j++) {
-//             array->strings[k++] = rightArray[j];
-//         }
-//     }
-
-//     // Free dynamically allocated memory
-//     free(leftArray);
-//     free(rightArray);
-//     free(leftStringArray);
-//     free(rightStringArray);
-// }
-
 void MergeSort ( StringArray * array, int left, int right ) {
     if ( left < right ) {
         int mid = ( left + right )/2;
@@ -182,7 +111,7 @@ void shellSort ( StringArray * array ) {
             array->strings[j] = temp;
         } 
         printStringArray(array);
-        if ( getDisorderRatio(array) <= 0.1 && interval <= 2 ) {
+        if ( getDisorderRatio(array) <= 0.1 && interval <= 2 && array->l <= 10 ) {
             printf("Switching to Insertion Sort\n");
             insertionSort(array);
             return;
@@ -250,6 +179,7 @@ int countInversions ( StringArray * array ) {
 }
 
 float getDisorderRatio ( StringArray * array ) {
+    if ( array->l == 1 ) return 0;
     int totalNumberOfPairs = (array->l * ( array->l - 1 ))/2;
     return (float)countInversions(array)/totalNumberOfPairs;
 }
@@ -317,6 +247,7 @@ int main () {
     }
     
     HybridSort(array);
+    printf("\n\n\n Final Sorted Array\n");
     printStringArray(array);
     getch();
     fclose(fp);
